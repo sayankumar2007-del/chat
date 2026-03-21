@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat App</title>
+</head>
+<body>
+
+<h2>Simple Chat</h2>
+
+<input id="msg" placeholder="Type message">
+<button onclick="sendMessage()">Send</button>
+
+<ul id="messages"></ul>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 🔥 Replace with your Firebase config
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_PROJECT",
+  projectId: "YOUR_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const msgList = document.getElementById("messages");
+
+function sendMessage() {
+  const msg = document.getElementById("msg").value;
+  addDoc(collection(db, "chat"), { text: msg });
+}
+
+// Real-time update
+onSnapshot(collection(db, "chat"), (snapshot) => {
+  msgList.innerHTML = "";
+  snapshot.forEach(doc => {
+    let li = document.createElement("li");
+    li.textContent = doc.data().text;
+    msgList.appendChild(li);
+  });
+});
+
+window.sendMessage = sendMessage;
+</script>
+
+</body>
+</html>
